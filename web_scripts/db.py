@@ -34,7 +34,7 @@ class Devices(SQLBase):
 with open(os.path.join(os.getenv("HOME"), ".my.cnf")) as f:
     password = dict(line.strip().split("=") for line in f if line.count("=") == 1)["password"]
 
-sqlengine = sqlalchemy.create_engine("mysql://cela:%s@sql.mit.edu/cela+hwops" % password)
+sqlengine = sqlalchemy.create_engine("mysql://hwops:%s@sql.mit.edu/hwops+hwops" % password)
 SQLBase.metadata.bind = sqlengine
 
 session = sqlalchemy.orm.sessionmaker(bind=sqlengine)()
