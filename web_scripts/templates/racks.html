@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Racks -- SIPB HWOPS</title>
+    <meta charset="UTF-8">
+    <style>
+    td { padding: 5px; }
+    .header td { border: 2px solid black; }
+    .gone { border: 0; }
+    </style>
+</head>
+<body>
+    <h2>SIPB HWOPS -- List of Racks</h2>
+
+    <p>Contact sipb-hwops [at] mit [dot] edu with questions and corrections.</p>
+
+    <p>{% if user %}Signed in as {{ user }}. <a href="{{ authlink }}">Sign out?</a>{% else %}<a href="{{ authlink }}">Sign in to edit</a>{% endif %}</p>
+
+    {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
+
+    <table border="1">
+    <tr class="header"><td>#</td>{% for rack in racks %}<td><a href="rack.py?rack={{ rack.name }}">{{ rack.name }}</a> ({{ rack.room }})</td>{% endfor %}</tr>
+    {% for row in rows %}
+        <tr>
+            <td>{{ loop.length - loop.index0 }}</td>
+            {% for cell in row %}
+                {% if cell == None %}
+                    <td class="gone"></td>
+                {% else %}
+                    <td rowspan="{{ cell.span }}">
+                        {% if cell.ids == None %}
+                            {{ cell.names[0] }}
+                            {% if can_update %}
+                                (<a href="add.py?rack={{ cell.rack }}&slot={{ cell.slot }}">add?</a>)
+                            {% endif %}
+                        {% else %}
+                            {% for name in cell.names %}
+                                <a href="device.py?id={{ cell.ids[loop.index0] }}">{{ name }}</a>{% if not loop.last %} &amp; {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+</body>
+</html>

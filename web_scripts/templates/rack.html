@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Rack View -- SIPB HWOPS</title>
+    <meta charset="UTF-8">
+    <style>
+    td { padding: 5px; }
+    .header td { border: 2px solid black; }
+    .gone { border: 0; }
+    </style>
+</head>
+<body>
+    <h2>SIPB HWOPS -- Rack View</h2>
+
+    <p>Contact sipb-hwops [at] mit [dot] edu with questions and corrections.</p>
+
+    <p>{% if user %}Signed in as {{ user }}. <a href="{{ authlink }}">Sign out?</a>{% else %}<a href="{{ authlink }}">Sign in to edit</a>{% endif %}</p>
+
+    {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
+
+    <p><a href="racks.py">Back</a></p>
+
+    <table border="1">
+    <tr><td>Name</td><td>{{ rack.name }}</td></tr>
+    <tr><td>Height</td><td>{{ rack.height }}</td></tr>
+    <tr><td>Sort Order</td><td>{{ rack.order }}</td></tr>
+    <tr><td>Room</td><td>{{ rack.room }}</td></tr>
+    <tr><td>Last Updated</td><td>{{ rack.last_updated }} by {{ rack.last_updated_by }}</td></tr>
+    </table>
+</body>
+</html>

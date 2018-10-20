@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Device View -- SIPB HWOPS</title>
+    <meta charset="UTF-8">
+    <style>
+    td { padding: 5px; }
+    .header td { border: 2px solid black; }
+    .gone { border: 0; }
+    </style>
+</head>
+<body>
+    <h2>SIPB HWOPS -- Device View</h2>
+
+    <p>Contact sipb-hwops [at] mit [dot] edu with questions and corrections.</p>
+
+    <p>{% if user %}Signed in as {{ user }}. <a href="{{ authlink }}">Sign out?</a>{% else %}<a href="{{ authlink }}">Sign in to edit</a>{% endif %}</p>
+
+    {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
+
+    <p><a href="racks.py">Back</a></p>
+
+    {% if can_update %}
+        <form action="perform.py?action=update&id={{ device.id }}" method="POST">
+        <table border="1">
+        <tr><td>Name</td><td><input type="text" name="devicename" value="{{ device.name }}"></td></tr>
+        <tr><td>Rack</td><td><input type="text" name="rack" value="{{ device.rack }}"> (TODO: dropdown)</td></tr>
+        <tr><td>Slots</td><td><input type="number" name="first" value="{{ device.rack_first_slot }}" min="1" max="{{ rack.height }}"> - <input type="number" name="last" value="{{ device.rack_last_slot }}" min="1" max="{{ rack.height }}"></td></tr>
+        <tr><td>IP</td><td><input type="text" name="ip" value="{{ device.ip }}"></td></tr>
+        <tr><td>Contact</td><td><input type="text" name="contact" value="{{ device.contact }}"></td></tr>
+        <tr><td>Owner</td><td><input type="text" name="owner" value="{{ device.owner }}"></td></tr>
+        <tr><td>Service Level</td><td><input type="text" name="service" value="{{ device.service_level }}"> (TODO: dropdown)</td></tr>
+        <tr><td>Model</td><td><input type="text" name="model" value="{{ device.model }}"></td></tr>
+        <tr><td>Comments</td><td><textarea rows="25" cols="80" name="comments">{{ device.comments }}</textarea></td></tr>
+        <tr><td>Last Updated</td><td>{{ device.last_updated }} by {{ device.last_updated_by }}</td></tr>
+        <tr><td>Moira Status</td><td><pre>{% for line in stella.splitlines() %}{{ line }}<br>{% endfor %}</pre></td></tr>
+        <tr><td>Update</td><td><input type="submit" value="Update"></td></tr>
+        </table>
+        </form>
+    {% else %}
+        <table border="1">
+        <tr><td>Name</td><td>{{ device.name }}</td></tr>
+        <tr><td>Rack</td><td><a href="rack.py?rack={{ device.rack }}">{{ device.rack }}</a></td></tr>
+        <tr><td>Slots</td><td>{{ device.rack_first_slot }} - {{ device.rack_last_slot }}</td></tr>
+        <tr><td>IP</td><td>{% if device.ip %}{{ device.ip }}{% else %}----{% endif %}</td></tr>
+        <tr><td>Contact</td><td>{% if device.contact %}{{ device.contact }}{% else %}no contact known{% endif %}</td></tr>
+        <tr><td>Owner</td><td>{% if device.owner %}{{ device.owner }}{% else %}no owner known{% endif %}</td></tr>
+        <tr><td>Service Level</td><td>{{ device.service_level }}</td></tr>
+        <tr><td>Model</td><td>{{ device.model }}</td></tr>
+        <tr><td>Comments</td><td>{% for line in device.comments.splitlines() %}{{ line }}<br>{% endfor %}</td></tr>
+        <tr><td>Last Updated</td><td>{{ device.last_updated }} by {{ device.last_updated_by }}</td></tr>
+        <tr><td>Moira Status</td><td><pre>{% for line in stella.splitlines() %}{{ line }}<br>{% endfor %}</pre></td></tr>
+        </table>
+    {% endif %}
+</body>
+</html>
