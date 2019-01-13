@@ -23,6 +23,9 @@
     <table border="1">
     <tr class="header"><td>SKU</td><td>Stock</td><td>Description</td></tr>
     {% for part, latest in parts %}<tr><td><a href="part.py?sku={{ part.sku }}">{{ part.sku }}</a></td><td>{% if latest %}{{ latest.new_count }}{% else %}0{% endif %}</td><td>{{ part.description }}</td></tr>{% endfor %}
+    {% if can_update %}<tr><td><a href="add-part.py">(add?)</a></td><td>--</td><td>--</td></tr>{% endif %}
     </table>
+
 </body>
 </html>
+

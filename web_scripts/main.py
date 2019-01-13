@@ -151,9 +151,16 @@ def print_part(sku):
     can_update = is_hwop(user)
     part = db.get_part(sku)
     inventory = sorted(db.get_inventory(sku), key=lambda i: -i.txid)
+    stock = inventory[0].new_count if inventory else 0
     inventory = [(step, step.new_count - previous) for step, previous in zip(inventory, [step.new_count for step in inventory[1:]] + [0])]
     print("Content-type: text/html\n")
-    print(jenv.get_template("part.html").render(part=part, inventory=inventory, user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
+    print(jenv.get_template("part.html").render(part=part, stock=stock, inventory=inventory, user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
+
+def print_add_part():
+    user, authlink = get_auth()
+    can_update = is_hwop(user)
+    print("Content-type: text/html\n")
+    print(jenv.get_template("add-part.html").render(user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
 
 # TODO: figure out better error handling for everything
 def perform_add(params):
@@ -194,3 +201,21 @@ def perform_update(params):
     db.session.commit()
     print("Content-type: text/html\n")
     print(jenv.get_template("done.html").render(id=device.id).encode("utf-8"))
+
+def perform_add_part(params):
+    user = kerbparse.get_kerberos()
+    if not is_hwop(user):
+        raise Exception("no access")
+    part = db.Parts(sku=params["sku"], description=params.get("description", ''), comments=params.get("comments", ""), last_updated_by=user)
+    db.add(part)
+    print("Content-type: text/html\n")
+    print(jenv.get_template("done-part.html").render(sku=part.sku).encode("utf-8"))
+
+def perform_update_stock(params):
+    user = kerbparse.get_kerberos()
+    if not is_hwop(user):
+        raise Exception("no access")
+    update = db.Inventory(sku=params["sku"], new_count=int(params["count"]), comment=params.get("comment", ""), submitted_by=user)
+    db.add(update)
+    print("Content-type: text/html\n")
+    print(jenv.get_template("done-part.html").render(sku=update.sku).encode("utf-8"))

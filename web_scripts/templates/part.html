@@ -7,6 +7,7 @@
     td { padding: 5px; }
     .header td { border: 2px solid black; }
     .gone { border: 0; }
+    input[type=text] { width: 800px; }
     </style>
 </head>
 <body>
@@ -24,23 +25,26 @@
     <tr><td>SKU</td><td>{{ part.sku }}</td></tr>
     <tr><td>Description</td><td>{{ part.description }}</td></tr>
     <tr><td>Comments</td><td>{{ part.comments }}</td></tr>
-    <tr><td>Stock</td><td>{% if inventory %}{{ inventory[0][0].new_count }}{% else %}0{% endif %}</td></tr>
+    <tr><td>Stock</td><td>{{ stock }}</td></tr>
     <tr><td>Last Updated</td><td>{{ part.last_updated }} by {{ part.last_updated_by }}</td></tr>
     </table>
 
 	<p>Stock-keeping history:</p>
 
+    {% if can_update %}<form action="perform.py?action=update-stock&sku={{ part.sku }}" method="POST">{% endif %}
     <table border="1">
-    <tr><td>TXID</td><td>Submitted</td><td>New Stock</td><td>Comment</td></tr>
+    <tr><td>TXID</td><td>New Stock</td><td>Comment</td><td>Submitted</td></tr>
+    {% if can_update %}<tr><td>--</td><td><input type="number" name="count" value="{{ stock }}" min="0"></td><td><input type="text" name="comment"></td><td><input type="submit" value="Submit"></td></tr>{% endif %}
     {% for update, delta in inventory %}
     <tr{% if loop.first %} class="header"{% endif %}>
         <td>{{ update.txid }}</td>
-        <td>{{ update.submitted }} by {{ update.submitted_by }}</td>
         <td>{{ update.new_count }} ({% if delta >= 0 %}+{% endif %}{{ delta }})</td>
         <td>{{ update.comment }}</td>
+        <td>{{ update.submitted }} by {{ update.submitted_by }}</td>
     </tr>
     {% endfor %}
-    <tr><td>--</td><td>--</td><td>0</td><td>initial state</td></tr>
+    <tr><td>--</td><td>0</td><td>initial state</td><td>--</td></tr>
     </table>
+    {% if can_update %}</form>{% endif %}
 </body>
 </html>

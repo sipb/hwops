@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add Part -- SIPB HWOPS</title>
+    <meta charset="UTF-8">
+    <style>
+    td { padding: 5px; }
+    .header td { border: 2px solid black; }
+    .gone { border: 0; }
+    </style>
+</head>
+<body>
+    <h2>SIPB HWOPS -- Add Part</h2>
+
+    <p>Contact sipb-hwops [at] mit [dot] edu with questions and corrections.</p>
+
+    {% if not user %}
+        <p><a href="{{ authlink }}">Sign in to create this entry</a></p>
+    {% elif not can_update %}
+        <p>You do not have access to create new parts. Please contact sipb-hwops [at] mit [dot] edu with your requested changes.</p>
+    {% else %}
+        <p>Signed in as {{ user }}.</p>
+
+        <p>Navigation: <a href="parts.py">Back</a></p>
+
+        <form action="perform.py?action=add-part" method="POST">
+        <table border="1">
+        <tr><td>SKU</td><td><input type="text" name="sku"></td></tr>
+        <tr><td>Description</td><td><input type="text" name="description"></td></tr>
+        <tr><td>Comments</td><td><textarea rows="25" cols="80" name="comments"></textarea></td></tr>
+        <tr><td>Stock</td><td>0</td></tr>
+        <tr><td>Create</td><td><input type="submit" value="Create"></td></tr>
+        </table>
+        </form>
+    {% endif %}
+</body>
+</html>
