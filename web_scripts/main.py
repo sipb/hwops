@@ -97,6 +97,12 @@ def get_auth():
         link = ("https://" + os.environ["HTTP_HOST"].split(":")[0] + ":444" + os.environ["REQUEST_URI"])
     return user, link
 
+def print_index():
+    user, authlink = get_auth()
+    can_update = is_hwop(user)
+    print("Content-type: text/html\n")
+    print(jenv.get_template("index.html").render(user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
+
 def print_racks():
     racks, rows = generate_rack_table()
     user, authlink = get_auth()
@@ -128,6 +134,26 @@ def print_add(rack_name, slot):
     assert 1 <= slot <= rack.height
     print("Content-type: text/html\n")
     print(jenv.get_template("add.html").render(rack=rack, user=user, email=email, slot=slot, authlink=authlink, can_update=can_update).encode("utf-8"))
+
+def print_parts():
+    user, authlink = get_auth()
+    can_update = is_hwop(user)
+    parts = db.get_all_parts()
+    latest = db.get_latest_inventory()
+    all_skus = set(part.sku for part in parts)
+    assert all(sku in all_skus for sku in latest)
+    parts = sorted((part, latest.get(part.sku)) for part in parts)
+    print("Content-type: text/html\n")
+    print(jenv.get_template("parts.html").render(parts=parts, user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
+
+def print_part(sku):
+    user, authlink = get_auth()
+    can_update = is_hwop(user)
+    part = db.get_part(sku)
+    inventory = sorted(db.get_inventory(sku), key=lambda i: -i.txid)
+    inventory = [(step, step.new_count - previous) for step, previous in zip(inventory, [step.new_count for step in inventory[1:]] + [0])]
+    print("Content-type: text/html\n")
+    print(jenv.get_template("part.html").render(part=part, inventory=inventory, user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
 
 # TODO: figure out better error handling for everything
 def perform_add(params):

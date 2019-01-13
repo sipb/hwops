@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Rack View -- SIPB HWOPS</title>
+    <title>Parts -- SIPB HWOPS</title>
     <meta charset="UTF-8">
     <style>
     td { padding: 5px; }
@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-    <h2>SIPB HWOPS -- Rack View</h2>
+    <h2>SIPB HWOPS -- List of Parts</h2>
 
     <p>Contact sipb-hwops [at] mit [dot] edu with questions and corrections.</p>
 
@@ -18,14 +18,11 @@
 
     {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
 
-    <p>Navigation: <a href="racks.py">Back</a></p>
+    <p>Navigation: <a href="racks.py">Server Inventory</a> | Parts Inventory</p>
 
     <table border="1">
-    <tr><td>Name</td><td>{{ rack.name }}</td></tr>
-    <tr><td>Height</td><td>{{ rack.height }}</td></tr>
-    <tr><td>Sort Order</td><td>{{ rack.order }}</td></tr>
-    <tr><td>Room</td><td>{{ rack.room }}</td></tr>
-    <tr><td>Last Updated</td><td>{{ rack.last_updated }} by {{ rack.last_updated_by }}</td></tr>
+    <tr class="header"><td>SKU</td><td>Stock</td><td>Description</td></tr>
+    {% for part, latest in parts %}<tr><td><a href="part.py?sku={{ part.sku }}">{{ part.sku }}</a></td><td>{% if latest %}{{ latest.new_count }}{% else %}0{% endif %}</td><td>{{ part.description }}</td></tr>{% endfor %}
     </table>
 </body>
 </html>

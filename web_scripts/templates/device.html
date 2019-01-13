@@ -18,7 +18,7 @@
 
     {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
 
-    <p><a href="racks.py">Back</a></p>
+    <p>Navigation: <a href="racks.py">Back</a></p>
 
     {% if can_update %}
         <form action="perform.py?action=update&id={{ device.id }}" method="POST">

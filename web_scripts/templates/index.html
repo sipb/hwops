@@ -14,6 +14,10 @@
 
     <p>Contact sipb-hwops [at] mit [dot] edu with questions and corrections.</p>
 
-    <p><a href="racks.py">View Racks</a></p>
+    <p>{% if user %}Signed in as {{ user }}. <a href="{{ authlink }}">Sign out?</a>{% else %}<a href="{{ authlink }}">Sign in to edit</a>{% endif %}</p>
+
+    {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
+
+    <p>Navigation: <a href="racks.py">Server Inventory</a> | <a href="parts.py">Parts Inventory</a></p>
 </body>
 </html>
