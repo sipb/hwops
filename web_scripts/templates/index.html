@@ -12,12 +12,33 @@
 <body>
     <h2>SIPB HWOPS</h2>
 
-    <p>Contact sipb-hwops [at] mit [dot] edu with questions and corrections.</p>
+    <p>Welcome to the website of <a href="https://sipb.mit.edu">SIPB</a>'s Hardware Operations (HWOPS) project!</p>
 
-    <p>{% if user %}Signed in as {{ user }}. <a href="{{ authlink }}">Sign out?</a>{% else %}<a href="{{ authlink }}">Sign in to edit</a>{% endif %}</p>
+    <p>Overview:
+    <ul><li>We are responsible for the operation of the SIPB machine room in W20-575A, as well as for some aspects of SIPB's servers in W91.</li>
+        <li>We provide physical server space, server hardware, and server support services to other SIPB projects.</li>
+        <li>If your project is not an official SIPB project, we will be able to refer you to other resources, but we will not be able to provide you with server space unless your project becomes recognized as an official SIPB project.</li>
+        <li>Some of our operational databases are publicly accessible on this website, for the sake of transparency.</li>
+        <li>As with all SIPB services, HWOPS is a volunteer-run service, and although we strive for perfect uptime of the server room, we will not always be able to provide it.</li>
+    </ul></p>
 
-    {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
+    <p>Contact information:
+    <ul><li>Emergency server support: Call the emergency contact listed at the bottom of this page. Otherwise, follow the instructions for non-emergency server support.</li>
+        <li>Non-emergency server support via email: email <a href="mailto:sipb-hwops@mit.edu">sipb-hwops@mit.edu</a>.</li>
+        <li>Non-emergency server support via chat: post to the Machine Rooms channel in SIPB Mattermost, tagging the primary support contact listed in the header.</li>
+        <li>Requests for hardware allocations: email <a href="mailto:sipb-hwops@mit.edu">sipb-hwops@mit.edu</a> with an explanation of your request.</li>
+        <li>To obtain one-off or long-term access to the SMR: email <a href="mailto:sipb-hwops@mit.edu">sipb-hwops@mit.edu</a> with an explanation of your request, and which supported project you are affiliated with.</li>
+        <li>To obtain a replacement for a lost or stolen access card: email <a href="mailto:physec@mit.edu">physec@mit.edu</a>.</li>
+        <li>To join the SIPB HWOPS project: email <a href="mailto:sipb-hwops@mit.edu">sipb-hwops@mit.edu</a> or show up at the SIPB meeting on Monday at 7:30 PM.</li>
+        <li>To try to talk to someone in person, if you couldn't get through any of the above means: show up at the SIPB meeting on Monday at 7:30 PM.</li>
+    </ul></p>
+
+    <p>As of 2019-02-18, the responsibility of managing the SIPB Machine Room has been transferred from the SIPB Vice Chair to the SIPB Hardware Operations project.</p>
+
+    <p>Server room emergency contact:<br>{% if user %}{% if on_office %}<b>{{ emergency }}</b><br>You can only see this information because you are on sipb-office@mit.edu.{% else %}Although you are logged in, you cannot view this information, because you are not on the mailing list sipb-office@mit.edu.{% endif %}{% else %}[Information hidden; <a href="{{ authlink }}">login</a> to view.]{% endif %}<br>Do not share this contact information with anyone outside of SIPB.</p>
 
     <p>Navigation: <a href="racks.py">Server Inventory</a> | <a href="parts.py">Parts Inventory</a></p>
+
+    <p>The source code for this website is available on <a href="https://github.com/sipb/hwops/">GitHub</a>.</p>
 </body>
 </html>

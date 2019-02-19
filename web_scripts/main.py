@@ -101,7 +101,15 @@ def print_index():
     user, authlink = get_auth()
     can_update = is_hwop(user)
     print("Content-type: text/html\n")
-    print(jenv.get_template("index.html").render(user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
+    on_office = moira.has_access(user, "sipb-office@mit.edu")
+    if user and on_office:
+        with open("/mit/hwops/info/emergency-contacts.txt") as f:
+            emergency_info = f.read()
+            if "\n" in emergency_info:
+                emergency_info = emergency_info.split("\n")[1]
+    else:
+        emergency_info = None
+    print(jenv.get_template("index.html").render(user=user, on_office=on_office, emergency=emergency_info, authlink=authlink, can_update=can_update).encode("utf-8"))
 
 def print_racks():
     racks, rows = generate_rack_table()
