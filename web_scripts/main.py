@@ -78,7 +78,7 @@ def generate_rack_table():
     return racks_out, spannify(columns, max_height)
 
 def is_hwop(user):
-    return moira.has_access(user, "sipb-hwops@mit.edu")
+    return moira.has_access(user, "sipb-hwops-team@mit.edu") or moira.has_access(user, "sipb-machine-room-access@mit.edu")
 
 def can_edit(user, device):
     if not user:
