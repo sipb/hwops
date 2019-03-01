@@ -18,7 +18,7 @@
 
     {% if user and not can_update %}<p>No edit permission.</p>{% endif %}
 
-    <p>Navigation: Server Inventory | <a href="parts.py">Parts Inventory</a></p>
+    <p>Navigation: Server Inventory | <a href="parts.py">Parts Inventory</a> | <a href="manuals">Documents and Manuals</a></p>
 
     <table border="1">
     <tr class="header"><td>#</td>{% for rack in racks %}<td><a href="rack.py?rack={{ rack.name }}">{{ rack.name }}</a> ({{ rack.room }})</td>{% endfor %}</tr>
