@@ -31,7 +31,7 @@
         <tr><td>Owner</td><td><input type="text" name="owner" value="{{ device.owner }}"></td></tr>
         <tr><td>Service Level</td><td><input type="text" name="service" value="{{ device.service_level }}"> (TODO: dropdown)</td></tr>
         <tr><td>Model</td><td><input type="text" name="model" value="{{ device.model }}"></td></tr>
-        <tr><td>Comments</td><td><textarea rows="25" cols="80" name="comments">{{ device.comments }}</textarea></td></tr>
+        <tr><td>Notes</td><td><textarea rows="25" cols="80" name="notes">{{ device.notes }}</textarea></td></tr>
         <tr><td>Last Updated</td><td>{{ device.last_updated }} by {{ device.last_updated_by }}</td></tr>
         <tr><td>Moira Status</td><td><pre>{% for line in stella.splitlines() %}{{ line }}<br>{% endfor %}</pre></td></tr>
         <tr><td>Update</td><td><input type="submit" value="Update"></td></tr>
@@ -47,10 +47,28 @@
         <tr><td>Owner</td><td>{% if device.owner %}{{ device.owner }}{% else %}no owner known{% endif %}</td></tr>
         <tr><td>Service Level</td><td>{{ device.service_level }}</td></tr>
         <tr><td>Model</td><td>{{ device.model }}</td></tr>
-        <tr><td>Comments</td><td>{% for line in device.comments.splitlines() %}{{ line }}<br>{% endfor %}</td></tr>
+        <tr><td>Notes</td><td>{% for line in device.notes.splitlines() %}{{ line }}<br>{% endfor %}</td></tr>
         <tr><td>Last Updated</td><td>{{ device.last_updated }} by {{ device.last_updated_by }}</td></tr>
         <tr><td>Moira Status</td><td><pre>{% for line in stella.splitlines() %}{{ line }}<br>{% endfor %}</pre></td></tr>
         </table>
     {% endif %}
+
+    <h2>History:</h2>
+
+    <table border="1">
+    {% for change in history %}
+    <tr class="header"><td colspan="3">Updated on {{ change.new.last_updated }} by {{ change.new.last_updated_by }} as follows:</td></tr>
+    <tr><td>Field</td><td>Old Value</td><td>New Value</td></tr>
+    {% if change.diff.name %}<tr><td>Name</td><td>{{ change.old.name }}</td><td>{{ change.new.name }}</td></tr>{% endif %}
+    {% if change.diff.rack %}<tr><td>Rack</td><td><a href="rack.py?rack={{ change.old.rack }}">{{ change.old.rack }}</a></td><td><a href="rack.py?rack={{ change.new.rack }}">{{ change.new.rack }}</a></td></tr>{% endif %}
+    {% if change.diff.rack_first_slot or change.diff.rack_last_slot %}<tr><td>Slots</td><td>{{ change.old.rack_first_slot }} - {{ change.old.rack_last_slot }}</td><td>{{ change.new.rack_first_slot }} - {{ change.new.rack_last_slot }}</td></tr>{% endif %}
+    {% if change.diff.ip %}<tr><td>IP</td><td>{% if change.old.ip %}{{ change.old.ip }}{% else %}----{% endif %}</td><td>{% if change.new.ip %}{{ change.new.ip }}{% else %}----{% endif %}</td></tr>{% endif %}
+    {% if change.diff.contact %}<tr><td>Contact</td><td>{% if change.old.contact %}{{ change.old.contact }}{% else %}no contact known{% endif %}</td><td>{% if change.new.contact %}{{ change.new.contact }}{% else %}no contact known{% endif %}</td></tr>{% endif %}
+    {% if change.diff.owner %}<tr><td>Owner</td><td>{% if change.old.owner %}{{ change.old.owner }}{% else %}no owner known{% endif %}</td><td>{% if change.new.owner %}{{ change.new.owner }}{% else %}no owner known{% endif %}</td></tr>{% endif %}
+    {% if change.diff.service_level %}<tr><td>Service Level</td><td>{{ change.old.service_level }}</td><td>{{ change.new.service_level }}</td></tr>{% endif %}
+    {% if change.diff.model %}<tr><td>Model</td><td>{{ change.old.model }}</td><td>{{ change.new.model }}</td></tr>{% endif %}
+    {% if change.diff.notes %}<tr><td>Updated Notes</td><td colspan="2">{% for line in change.new.notes.splitlines() %}{{ line }}<br>{% endfor %}</td></tr>{% endif %}
+    {% endfor %}
+    </table>
 </body>
 </html>

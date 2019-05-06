@@ -14,9 +14,14 @@ class Racks(SQLBase):
     last_updated = sqlalchemy.Column(sqlalchemy.TIMESTAMP(), nullable=False)
     last_updated_by = sqlalchemy.Column(sqlalchemy.String(63), nullable=False)
 
-class Devices(SQLBase):
-    __tablename__ = "devices"
+class DeviceIDs(SQLBase):
+    __tablename__ = "deviceids"
     id = sqlalchemy.Column(sqlalchemy.Integer(), nullable=False, primary_key=True)
+
+class DeviceUpdates(SQLBase):
+    __tablename__ = "devices"
+    id = sqlalchemy.Column(sqlalchemy.Integer(), nullable=False)
+    txid = sqlalchemy.Column(sqlalchemy.Integer(), nullable=False, primary_key=True)
     name = sqlalchemy.Column(sqlalchemy.String(63), nullable=False)
     rack = sqlalchemy.Column(sqlalchemy.String(63), nullable=False)
     rack_first_slot = sqlalchemy.Column(sqlalchemy.Integer(), nullable=False)
@@ -26,7 +31,7 @@ class Devices(SQLBase):
     owner = sqlalchemy.Column(sqlalchemy.String(63), nullable=False)
     service_level = sqlalchemy.Column(sqlalchemy.String(63), nullable=False)
     model = sqlalchemy.Column(sqlalchemy.Text(), nullable=False)
-    comments = sqlalchemy.Column(sqlalchemy.Text(), nullable=False)
+    notes = sqlalchemy.Column(sqlalchemy.Text(), nullable=False)
 
     last_updated = sqlalchemy.Column(sqlalchemy.TIMESTAMP(), nullable=False)
     last_updated_by = sqlalchemy.Column(sqlalchemy.String(63), nullable=False)
@@ -62,7 +67,14 @@ def get_all_racks():
     return session.query(Racks).all()
 
 def get_all_devices():
-    return session.query(Devices).all()
+    devices = []
+    seen = set()
+    for device in session.query(DeviceUpdates).order_by(DeviceUpdates.txid.desc()).all():
+        if device.id in seen:
+            continue
+        seen.add(device.id)
+        devices.append(device)
+    return devices
 
 def get_all_parts():
     return session.query(Parts).all()
@@ -85,8 +97,12 @@ def get_part(sku):
 def get_rack(name):
     return session.query(Racks).filter_by(name=name).one()
 
-def get_device(id):
-    return session.query(Devices).filter_by(id=id).one()
+# latest version is at the end of the returned list
+def get_device_history(id):
+    return session.query(DeviceUpdates).filter_by(id=id).order_by(DeviceUpdates.txid).all()
+
+def get_device_latest(id):
+    return session.query(DeviceUpdates).filter_by(id=id).order_by(DeviceUpdates.txid.desc()).limit(1).one()
 
 def add(x):
     session.add(x)

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import cgitb; cgitb.enable()
+# import cgitb; cgitb.enable()
 import db
 import os
 import jinja2
 import kerbparse
 import moira
 import urlparse
+from collections import namedtuple
 
 jenv = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"), autoescape=True)
 
@@ -125,14 +126,51 @@ def print_rack(rack_name):
     print("Content-type: text/html\n")
     print(jenv.get_template("rack.html").render(rack=rack, user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
 
+Device = namedtuple("Device", "name rack rack_first_slot rack_last_slot ip contact owner service_level model notes")
+DeviceDelta = namedtuple("DeviceDelta", "diff new old")
+
+def to_device(device):
+    return Device(name = device.name,
+                  rack = device.rack,
+                  rack_first_slot = device.rack_first_slot,
+                  rack_last_slot = device.rack_last_slot,
+                  ip = device.ip,
+                  contact = device.contact,
+                  owner = device.owner,
+                  service_level = device.service_level,
+                  model = device.model,
+                  notes = device.notes)
+
+def device_diff(old, new):
+    old, new = to_device(old), to_device(new)
+    return Device(*[(elem_old != elem_new) for elem_old, elem_new in zip(old, new)])
+
+def compute_device_changes(history):
+    deltas = []
+    old = Device(name="", rack="", rack_first_slot=0, rack_last_slot=0, ip="", contact=None, owner=None, service_level="", model="", notes="")
+    for new in history:
+        deltas.append(DeviceDelta(diff=device_diff(old, new), new=new, old=old))
+        old = new
+    return deltas
+
 def print_device(device_id):
     user, authlink = get_auth()
-    device = db.get_device(device_id)
-    can_update = can_edit(user, device)
-    rack = db.get_rack(device.rack)
-    stella = moira.stella(device.name)
-    print("Content-type: text/html\n")
-    print(jenv.get_template("device.html").render(device=device, rack=rack, user=user, authlink=authlink, can_update=can_update, stella=stella).encode("utf-8"))
+    device_history = db.get_device_history(device_id)
+
+    if not device_history:
+        print "Content-type: text/plain\n"
+        print "no such device ID", device_id
+        return
+
+    latest_device = device_history[-1]
+    latest_rack = db.get_rack(latest_device.rack)
+    can_update = can_edit(user, latest_device)
+
+    computed_history = compute_device_changes(device_history)
+    computed_history.reverse()
+    stella = moira.stella(latest_device.name)
+    print "Content-type: text/html\n"
+    print jenv.get_template("device.html").render(device=latest_device, rack=latest_rack, history=computed_history, user=user, authlink=authlink, can_update=can_update, stella=stella).encode("utf-8")
 
 def print_add(rack_name, slot):
     user, authlink = get_auth()
@@ -180,14 +218,16 @@ def perform_add(params):
     assert 1 <= first <= last <= rack.height
     if not moira.is_email_valid_for_owner(params["owner"]):
         raise Exception("bad owner")
-    dev = db.Devices(name=params["devicename"], rack=params["rack"], rack_first_slot=first, rack_last_slot=last, ip=params.get("ip"), contact=params["contact"], owner=params["owner"], service_level=params["service"], model=params["model"], comments=params.get("comments"), last_updated_by=user)
+    devid = db.DeviceIDs()
+    db.add(devid)
+    dev = db.DeviceUpdates(id=devid.id, name=params["devicename"], rack=params["rack"], rack_first_slot=first, rack_last_slot=last, ip=params.get("ip", ""), contact=params["contact"], owner=params["owner"], service_level=params.get("service", ""), model=params.get("model", ""), notes=params.get("notes", ""), last_updated_by=user)
     db.add(dev)
     print("Content-type: text/html\n")
     print(jenv.get_template("done.html").render(id=dev.id).encode("utf-8"))
 
 def perform_update(params):
     user = kerbparse.get_kerberos()
-    device = db.get_device(params["id"])
+    device = db.get_device_latest(params["id"])
     if not can_edit(user, device):
         raise Exception("no access")
     rack = db.get_rack(params["rack"])
@@ -195,17 +235,21 @@ def perform_update(params):
     assert 1 <= first <= last <= rack.height
     if not moira.is_email_valid_for_owner(params["owner"]):
         raise Exception("bad owner")
-    device.name = params["devicename"]
-    device.rack = params["rack"]
-    device.rack_first_slot = first
-    device.rack_last_slot = last
-    device.ip = params.get("ip")
-    device.contact = params["contact"]
-    device.owner = params["owner"]
-    device.service_level = params["service"]
-    device.model = params["model"]
-    device.comments = params.get("comments")
-    device.last_updated_by = user
+    ndevice = db.DeviceUpdates(
+        id = device.id,
+        name = params["devicename"],
+        rack = params["rack"],
+        rack_first_slot = first,
+        rack_last_slot = last,
+        ip = params.get("ip", ""),
+        contact = params["contact"],
+        owner = params["owner"],
+        service_level = params.get("service", ""),
+        model = params.get("model", ""),
+        notes = params.get("notes", ""),
+        last_updated_by = user,
+    )
+    db.add(ndevice)
     db.session.commit()
     print("Content-type: text/html\n")
     print(jenv.get_template("done.html").render(id=device.id).encode("utf-8"))
@@ -214,7 +258,7 @@ def perform_add_part(params):
     user = kerbparse.get_kerberos()
     if not is_hwop(user):
         raise Exception("no access")
-    part = db.Parts(sku=params["sku"], description=params.get("description", ''), comments=params.get("comments", ""), last_updated_by=user)
+    part = db.Parts(sku=params["sku"], description=params.get("description", ''), notes=params.get("notes", ""), last_updated_by=user)
     db.add(part)
     print("Content-type: text/html\n")
     print(jenv.get_template("done-part.html").render(sku=part.sku).encode("utf-8"))
