@@ -1,0 +1,206 @@
+<h1>Requesting a server in the SIPB Machine Room</h1>
+
+<p>Please fill out the following form, and email it to sipb-hwops@mit.edu. Refer to the sample responses below for guidance on how to fill out the form.</p>
+
+<h2>The form</h2>
+
+<pre>
+Part I. Basic information
+
+  Project name:
+  Server name:
+  Primary contact:
+  Contact email:
+  Owner list:
+  Service level:
+    [ ] production
+    [ ] development
+  Description of the server's purpose:
+
+  Description of why neither Scripts nor XVM are appropriate:
+
+  Deployment timeline:
+
+
+Part II. Server hardware
+
+  [ ] We will provide our own existing hardware OR
+  [ ] We intend to purchase the following hardware:
+
+    Hardware configuration:
+    1. Server height:
+    2. Hard disk sizes:
+       2.5" capacities:
+       3.5" capacities:
+    3. Hardware raid?
+    3. Memory capacity:
+    4. CPU model (if known):
+    5. Number of cores / hyperthreads:
+    6. Vendor and model:
+    7. Redundant power?
+    8. Network connection speeds:
+
+  [ ] We would like existing hardware allocated to us:
+
+    Request parameters:
+    1. Minimum sum HDD size:
+    2. Maximum useful sum HDD size:
+    3. Hardware raid required?
+    4. Minimum memory capacity:
+    5. Maximum useful memory capacity:
+    6. Minimum number of CPU cores / hyperthreads:
+    7. Redundant power required?
+    8. Minimum network connectivity speed:
+
+  Additional request details:
+
+
+Part III. Network connectivity
+
+  [ ] We already have a hostname that we would like to use:
+    Hostname:
+  [ ] Please allocate the following hostname for us:
+    Hostname:
+    Aliases:
+
+  [ ] I would like to reuse an existing IP address.
+    Address:
+  [ ] I would like to request a new IP address:
+    Network:
+      [ ] SIPB-458
+      [ ] SIPB-459
+      [ ] SIPB-460 (default public network)
+      [ ] SIPB-461
+      [ ] SIPB-NEW
+
+  Additional request details:
+
+
+Part IV. Capacity plan
+
+  [ ] We do not expect to have to expand this service in the foreseeable
+      future.
+  [ ] We are likely to need additional:
+      [ ] Disk space
+      [ ] Memory capacity
+      [ ] Network bandwidth
+      [ ] Distinct servers
+      [ ] Rack space
+
+      What do you expect the increase of each of these to be each year?
+
+  Additional request details:
+    
+
+Part V. Physical access
+
+  [ ] All current maintainers already have card access to the SMR.
+  [ ] The following additional maintainers will need card access to the SMR, to
+      maintain this service:
+      * 
+      * 
+      * 
+
+</pre>
+
+<h2>Sample responses</h2>
+
+<pre>
+Part I. Basic information
+
+  Project name:    Hyades
+  Server name:     RHOMBI
+  Primary contact: Cel Skeggs
+  Contact email:   sipb-hyades@mit.edu
+  Owner list:      sipb-hyades-root@mit.edu
+  Service level:
+    [ ] production
+    [X] development
+  Description of the server's purpose:
+    RHOMBI will be used as a build server so that members of the Hyades project
+    who cannot build software locally can have a place to do so.
+  Description of why neither Scripts nor XVM are appropriate:
+    Neither are intended for heavy compute, which is the primary function of
+    RHOMBI.
+  Deployment timeline:
+    We would like this server deployed within the next week, so that we can
+    continue onboarding new contributors.
+
+Part II. Server hardware
+
+  [ ] We will provide our own existing hardware OR
+  [ ] We intend to purchase the following hardware:
+
+    Hardware configuration:
+    1. Server height: 2U
+    2. Hard disk sizes:
+       2.5" capacities: 2x 136 GB HDDs, 6x empty
+       3.5" capacities: none
+    3. Hardware raid? Yes.
+    3. Memory capacity: 96 GB
+    4. CPU model (if known): Intel Xeon X5680 @ 3.33 GHz
+    5. Number of cores / hyperthreads: 12/24
+    6. Vendor and model: PowerEdge R710
+    7. Redundant power? Yes.
+    8. Network connection speeds: 8x gigabit ethernet
+
+  [X] We would like existing hardware allocated to us:
+
+    Request parameters:
+    1. Minimum sum HDD size: 500 GB
+    2. Maximum useful sum HDD size: 2 TB
+    3. Hardware raid required? No.
+    4. Minimum memory capacity: 32 GB
+    5. Maximum useful memory capacity: 128 GB
+    6. Minimum number of CPU cores / hyperthreads: 8/16
+    7. Redundant power required? No.
+    8. Minimum network connectivity speed: 100 mbit/s ethernet
+
+  Additional request details:
+    None.
+
+Part III. Network connectivity
+
+  [ ] We already have a hostname that we would like to use:
+    Hostname: RHOMBI.MIT.EDU
+  [X] Please allocate the following hostname for us:
+    Hostname: RHOMBI.MIT.EDU
+    Aliases: SIPB-HYADES-BUILD-VMS.MIT.EDU
+
+  [ ] I would like to reuse an existing IP address.
+    Address: 18.4.60.123
+  [X] I would like to request a new IP address:
+    Network:
+      [ ] SIPB-458
+      [ ] SIPB-459
+      [X] SIPB-460 (default public network)
+      [ ] SIPB-461
+      [ ] SIPB-NEW
+
+  Additional request details:
+    None.
+
+Part IV. Capacity plan
+
+  [X] We do not expect to have to expand this service in the foreseeable
+      future.
+  [ ] We are likely to need additional:
+      [ ] Disk space
+      [ ] Memory capacity
+      [ ] Network bandwidth
+      [ ] Distinct servers
+      [ ] Rack space
+
+      What do you expect the increase of each of these to be each year?
+
+  Additional request details:
+    None.
+
+Part V. Physical access
+
+  [X] All current maintainers already have card access to the SMR.
+  [ ] The following additional maintainers will need card access to the SMR, to
+      maintain this service:
+      * Cel Skeggs (keyholder)
+
+</pre>
