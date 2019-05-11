@@ -4,6 +4,7 @@ import db
 import os
 import jinja2
 import kerbparse
+import mail
 import moira
 import urlparse
 from collections import namedtuple
@@ -79,7 +80,7 @@ def generate_rack_table():
     return racks_out, spannify(columns, max_height)
 
 def is_hwop(user):
-    return moira.has_access(user, "sipb-hwops-team@mit.edu") or moira.has_access(user, "sipb-machine-room-access@mit.edu")
+    return moira.has_access(user, "sipb-hwops@mit.edu") or moira.has_access(user, "sipb-hwops-users@mit.edu")
 
 def can_edit(user, device):
     if not user:
@@ -90,13 +91,16 @@ def can_edit(user, device):
         return True
     return False
 
+def get_base_url(authenticate):
+    host = os.environ["HTTP_HOST"].split(":")[0]
+    if authenticate:
+        return "https://%s:444" % host
+    else:
+        return "https://%s" % host
+
 def get_auth():
     user = kerbparse.get_kerberos()
-    if user:
-        link = ("https://" + os.environ["HTTP_HOST"].split(":")[0] + os.environ["REQUEST_URI"])
-    else:
-        link = ("https://" + os.environ["HTTP_HOST"].split(":")[0] + ":444" + os.environ["REQUEST_URI"])
-    return user, link
+    return user, get_base_url(authenticate=not user) + os.environ["REQUEST_URI"]
 
 def print_index():
     user, authlink = get_auth()
@@ -208,6 +212,11 @@ def print_add_part():
     print("Content-type: text/html\n")
     print(jenv.get_template("add-part.html").render(user=user, authlink=authlink, can_update=can_update).encode("utf-8"))
 
+def send_notification(updated, device, who):
+    kind = "Update to" if updated else "Addition of"
+    body = "See the record at %s/device.py?id=%d\r\n" % (get_base_url(False), device.id)
+    mail.send("Hardware Operations Team <sipb-hwops-team@mit.edu>", "Hardware Operations Notifier <hwops@scripts.mit.edu>", "%s hardware record for %s by %s" % (kind, device.name, who), body)
+
 # TODO: figure out better error handling for everything
 def perform_add(params):
     user = kerbparse.get_kerberos()
@@ -222,6 +231,7 @@ def perform_add(params):
     db.add(devid)
     dev = db.DeviceUpdates(id=devid.id, name=params["devicename"], rack=params["rack"], rack_first_slot=first, rack_last_slot=last, ip=params.get("ip", ""), contact=params["contact"], owner=params["owner"], service_level=params.get("service", ""), model=params.get("model", ""), notes=params.get("notes", ""), last_updated_by=user)
     db.add(dev)
+    send_notification(False, dev, user)
     print("Content-type: text/html\n")
     print(jenv.get_template("done.html").render(id=dev.id).encode("utf-8"))
 
@@ -251,6 +261,7 @@ def perform_update(params):
     )
     db.add(ndevice)
     db.session.commit()
+    send_notification(True, ndevice, user)
     print("Content-type: text/html\n")
     print(jenv.get_template("done.html").render(id=device.id).encode("utf-8"))
 
